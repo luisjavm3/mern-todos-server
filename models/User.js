@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const UserSchema = new mongoose.Schema(
    {
@@ -6,11 +8,38 @@ const UserSchema = new mongoose.Schema(
          type: String,
          required: [true, 'Please provide an username.'],
          unique: [true, 'This username already exists.'],
-         minLength: [4, 'The username must has more than 3 characters.'],
+         minLength: [4, 'The username has to have more than 3 characters.'],
+         maxLength: [15, 'The username has to have less than 10 characters.'],
+      },
+      role: {
+         type: String,
+         enum: ['user', 'admin', 'super'],
+         default: 'user',
+      },
+      password: {
+         type: String,
+         required: [true, 'Please provide a password.'],
+         minLength: [6, 'The password has to have more than 5 characters.'],
       },
    },
    { timestamps: true }
 );
+
+UserSchema.pre('save', async function (next) {
+   if (!this.isModified('password')) {
+      return next();
+   }
+
+   const salt = await bcrypt.genSalt(10);
+   this.password = await bcrypt.hash(this.password, salt);
+});
+
+UserSchema.methods.generateToken = function () {
+   const SECRET_KEY = process.env.SECRET_KEY;
+   const payload = { id: this._id };
+
+   return jwt.sign(payload, SECRET_KEY, { expiresIn: '10min' });
+};
 
 const User = mongoose.model('User', UserSchema);
 export default User;

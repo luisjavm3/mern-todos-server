@@ -4,10 +4,17 @@ export const signupController = async (req, res, next) => {
    const user = req.body;
 
    try {
-      const savedUser = await User.create(user);
+      const newUser = await User.create(user);
 
-      res.status(200).json(savedUser);
+      const token = newUser.generateToken();
+
+      res.status(200).json({ success: true, token });
+      //   sendToken(res, token);
    } catch (error) {
-      res.status(500).json(error);
+      next(error);
    }
 };
+
+// const sendToken = (res, user) => {
+//    res.status(200).json({ success: true, token });
+// };

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import colors from 'colors';
 
 import dbConnection from './config/dbConnection.js';
+import errorHandler from './middlewares/errorHandler.js';
 
 import authRoutes from './routes/authRoutes.js';
 
@@ -14,6 +15,7 @@ dbConnection();
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
