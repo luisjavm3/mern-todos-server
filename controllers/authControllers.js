@@ -1,7 +1,6 @@
 import User from '../models/User.js';
-// import bcrypt from 'bcrypt';
 
-import ErrorResponse from '../utils/ErrorResponse.js';
+import ErrorResponse from '../middlewares/ErrorResponse.js';
 
 export const signupController = async (req, res, next) => {
    const user = req.body;

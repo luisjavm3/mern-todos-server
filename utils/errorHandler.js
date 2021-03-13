@@ -1,4 +1,4 @@
-import ErrorResponse from '../utils/ErrorResponse.js';
+import ErrorResponse from '../middlewares/ErrorResponse.js';
 
 const errorHandler = (err, req, res, next) => {
    let error;
@@ -13,6 +13,14 @@ const errorHandler = (err, req, res, next) => {
    if (err.name === 'ValidationError') {
       const message = Object.values(err.errors);
       error = new ErrorResponse(message, 400);
+   }
+
+   if (err.name === 'JsonWebTokenError') {
+      error = new ErrorResponse(err.message, 400);
+   }
+
+   if (err.name === 'TokenExpiredError') {
+      error = new ErrorResponse(err.message, 400);
    }
 
    let jsonResponse = {
