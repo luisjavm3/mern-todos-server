@@ -15,11 +15,14 @@ const errorHandler = (err, req, res, next) => {
       error = new ErrorResponse(message, 400);
    }
 
-   res.status(error?.statusCode || err?.statusCode || 500).json({
+   let jsonResponse = {
       success: false,
       error: error?.message || err?.message || 'Unknown server error',
-      details: error || err instanceof ErrorResponse ? null : err,
-   });
+   };
+
+   if (!error && !(err instanceof ErrorResponse)) jsonResponse.details = err;
+
+   res.status(error?.statusCode || err?.statusCode || 500).json(jsonResponse);
 };
 
 export default errorHandler;

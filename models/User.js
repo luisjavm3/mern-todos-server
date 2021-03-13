@@ -41,5 +41,9 @@ UserSchema.methods.generateToken = function () {
    return jwt.sign(payload, SECRET_KEY, { expiresIn: '10min' });
 };
 
+UserSchema.methods.isMatchPassword = function (password) {
+   return bcrypt.compareSync(password, this.password);
+};
+
 const User = mongoose.model('User', UserSchema);
 export default User;
