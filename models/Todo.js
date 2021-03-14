@@ -5,7 +5,8 @@ const TodoSchema = new mongoose.Schema(
       name: {
          type: String,
          required: [true, "Please provide an Todo's name."],
-         minLength: [5, "Todo's name has to have more than 4 characteres."],
+         minLength: [5, "Todo's name has to have more than 4 characters."],
+         nullable: false,
       },
       creatorId: {
          type: String,

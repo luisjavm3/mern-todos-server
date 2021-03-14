@@ -5,7 +5,12 @@ const dbConnection = () => {
 
    mongoose.connect(
       URI,
-      { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
+      {
+         useNewUrlParser: true,
+         useUnifiedTopology: true,
+         useCreateIndex: true,
+         useFindAndModify: false,
+      },
       (err) => {
          if (err) return console.log('Database not connected.'.bgRed.black);
          console.log('Database connected'.bgGreen.black);

@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 
-import ErrorResponse from '../middlewares/ErrorResponse.js';
+import ErrorResponse from '../utils/ErrorResponse.js';
 
 export const signupController = async (req, res, next) => {
    const user = req.body;
