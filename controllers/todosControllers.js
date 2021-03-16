@@ -38,13 +38,27 @@ export const createTodoController = async (req, res, next) => {
 
 export const updateTodoController = async (req, res, next) => {
    const { todoId } = req.params;
-   const { name } = req.body;
+   const { name, creatorId } = req.body;
+   const { user } = req;
 
-   if (!name)
-      return next(new ErrorResponse('Please provide a name to modify.', 400));
+   if (!name || !creatorId)
+      return next(
+         new ErrorResponse('Please provide a name and creatorId.', 400)
+      );
 
    if (!mongoose.Types.ObjectId.isValid(todoId))
       return next(new ErrorResponse(`ID: ${todoId} incorrect.`, 400));
+
+   if (!mongoose.Types.ObjectId.isValid(creatorId))
+      return next(new ErrorResponse(`creatorId ${creatorId} incorrect.`, 400));
+
+   if (user.role === USER && creatorId !== user._id)
+      return next(
+         new ErrorResponse(
+            "The Todo you tried modify doesn't belong to you.",
+            403
+         )
+      );
 
    try {
       const updatedTodo = await Todo.findByIdAndUpdate(

@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-const TodoSchema = new mongoose.Schema(
+const { Schema, model } = mongoose;
+
+const TodoSchema = new Schema(
    {
       name: {
          type: String,
@@ -9,12 +11,12 @@ const TodoSchema = new mongoose.Schema(
          nullable: false,
       },
       creatorId: {
-         type: String,
+         type: Schema.Types.ObjectId,
          required: [true, "Todo has to have an creator's id."],
       },
    },
    { timestamps: true }
 );
 
-const Todo = mongoose.model('Todo', TodoSchema);
+const Todo = model('Todo', TodoSchema);
 export default Todo;
