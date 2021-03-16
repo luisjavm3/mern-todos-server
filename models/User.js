@@ -36,9 +36,10 @@ UserSchema.pre('save', async function (next) {
 
 UserSchema.methods.generateToken = function () {
    const SECRET_KEY = process.env.SECRET_KEY;
+   const JWT_EXPIRATION_TIME = process.env.JWT_EXPIRATION_TIME;
    const payload = { id: this._id };
 
-   return jwt.sign(payload, SECRET_KEY, { expiresIn: '10min' });
+   return jwt.sign(payload, SECRET_KEY, { expiresIn: JWT_EXPIRATION_TIME });
 };
 
 UserSchema.methods.isMatchPassword = function (password) {

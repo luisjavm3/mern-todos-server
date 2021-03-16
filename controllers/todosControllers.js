@@ -3,6 +3,8 @@ import ErrorResponse from '../utils/ErrorResponse.js';
 import { USER } from '../config/roles.js';
 import mongoose from 'mongoose';
 
+const { Types } = mongoose;
+
 export const getAllTodosController = async (req, res, next) => {
    let todos;
    const { user } = req;
@@ -51,7 +53,8 @@ export const getAllTodosController = async (req, res, next) => {
          todos = await Todo.find();
       }
 
-      res.status(200).json(todos);
+      const messageResponse = { success: true, content: todos };
+      res.status(200).json(messageResponse);
    } catch (error) {
       next(error);
    }
@@ -66,8 +69,9 @@ export const createTodoController = async (req, res, next) => {
 
    try {
       const newTodo = await Todo.create({ name, creatorId: user.id });
+      const messageResponse = { success: true, content: newTodo };
 
-      res.status(200).json(newTodo);
+      res.status(200).json(messageResponse);
    } catch (error) {
       next(error);
    }
@@ -83,10 +87,10 @@ export const updateTodoController = async (req, res, next) => {
          new ErrorResponse('Please provide a name and creatorId.', 400)
       );
 
-   if (!mongoose.Types.ObjectId.isValid(todoId))
+   if (!Types.ObjectId.isValid(todoId))
       return next(new ErrorResponse(`ID: ${todoId} incorrect.`, 400));
 
-   if (!mongoose.Types.ObjectId.isValid(creatorId))
+   if (!Types.ObjectId.isValid(creatorId))
       return next(new ErrorResponse(`creatorId ${creatorId} incorrect.`, 400));
 
    if (user.role === USER && creatorId !== user._id)
@@ -104,7 +108,38 @@ export const updateTodoController = async (req, res, next) => {
          { new: true }
       );
 
-      res.status(200).json(updatedTodo);
+      const messageResponse = { success: true, content: updatedTodo };
+
+      res.status(200).json(messageResponse);
+   } catch (error) {
+      next(error);
+   }
+};
+
+export const deleteTodoController = async (req, res, next) => {
+   // res.status(200).send('This route works.');
+   const { todoId } = req.params;
+   const { user } = req;
+   // res.status(200).send(user);
+
+   if (!Types.ObjectId.isValid(todoId))
+      return next(new ErrorResponse("Invalid Todo's id", 400));
+
+   try {
+      let todo = await Todo.findById(todoId);
+
+      if (user.role === USER && String(todo.creatorId) !== String(user._id)) {
+         console.log('Entra');
+         return next(
+            new ErrorResponse('Cannot delete an Todo of another user', 400)
+         );
+      }
+
+      todo = await Todo.findByIdAndDelete(todoId);
+
+      const messageResponse = { success: true, content: todo };
+
+      res.status(200).json(messageResponse);
    } catch (error) {
       next(error);
    }
