@@ -9,8 +9,45 @@ export const getAllTodosController = async (req, res, next) => {
 
    try {
       if (user.role === USER) {
-         todos = await Todo.find({ creatorId: user._id });
+         const findTodosWithUserCreatorPipeline = [
+            {
+               $match: {
+                  creatorId: user._id,
+               },
+            },
+            {
+               $lookup: {
+                  from: 'users',
+                  localField: 'creatorId',
+                  foreignField: '_id',
+                  as: 'user',
+               },
+            },
+            {
+               $unwind: {
+                  path: '$user',
+               },
+            },
+         ];
+
+         todos = await Todo.aggregate(findTodosWithUserCreatorPipeline);
       } else {
+         const findAllTodosWithUserCreatorPipeline = [
+            {
+               $lookup: {
+                  from: 'users',
+                  localField: 'creatorId',
+                  foreignField: '_id',
+                  as: 'user',
+               },
+            },
+            {
+               $unwind: {
+                  path: '$user',
+               },
+            },
+         ];
+
          todos = await Todo.find();
       }
 
